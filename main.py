@@ -11,13 +11,16 @@ class UsedFieldError(Exception):
     pass
 
 class gameOver(Exception):
-    def __init__(self, winner):
+    def __init__(self, char):
         global player_char
+        global comp_char
 
-        if winner == player_char:
+        if char == player_char:
             self.message = "You won!"
+        elif char == comp_char:
+            self.message = "You lost :("
         else:
-            self.message = "You lost :(" 
+            self.message = "It's Draw"
 
 matrix = [[str(i + 1 + (j * 3)) for i in range(3)] for j in range(3)]
 # gameOver = False
@@ -95,7 +98,8 @@ def Win():
     except IndexError:
         print("IndexError")
     '''
-    
+
+    # if someone is winner
     if matrix[0][0] == matrix[0][1] == matrix[0][2]:
         raise gameOver(matrix[0][0])
     elif matrix[1][0] == matrix[1][1] == matrix[1][2]:
@@ -112,6 +116,13 @@ def Win():
         raise gameOver(matrix[0][0])
     elif matrix[0][2] == matrix[1][1] == matrix[2][0]:
         raise gameOver(matrix[0][2])
+
+    # if Draw
+    for raw in matrix:
+        for field in raw:
+            if field != 'O' and field != 'X':
+                return
+    raise gameOver("draw")
 
 try:
     Draw()
