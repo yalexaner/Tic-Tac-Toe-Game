@@ -1,11 +1,26 @@
 import os # system("clean")
 import random # randrange
 
+'''
+1 2 3   1, 2, 3 - first raw, etc.
+4 5 6   1, 4, 7 - first column, etc.
+7 8 9   1, 5, 9 - left-to-right diagonal, 3, 5, 7 - right-to-left diagonal
+'''
+
 class UsedFieldError(Exception):
     pass
 
-matrix = [[i + 1 + (j * 3) for i in range(3)] for j in range(3)]
-gameOver = False
+class gameOver(Exception):
+    def __init__(self, winner):
+        global player_char
+
+        if winner == player_char:
+            self.message = "You won!"
+        else:
+            self.message = "You lost :(" 
+
+matrix = [[str(i + 1 + (j * 3)) for i in range(3)] for j in range(3)]
+# gameOver = False
 
 os.system("clear")
 
@@ -51,80 +66,62 @@ def Logic():
             break
 
 def Win():
-    global gameOver
+    # global gameOver
+    # global matrix_zones
 
     '''
-    if matrix[0][0] == matrix[0][1] == matrix[0][2] or matrix[1][0] == matrix[1][1] == matrix[1][2] or\
-       matrix[2][0] == matrix[2][1] == matrix[2][2] or matrix[0][0] == matrix[1][0] == matrix[2][0] or\
-       matrix[0][1] == matrix[1][1] == matrix[2][1] or matrix[0][2] == matrix[1][2] == matrix[2][2] or\
-       matrix[0][0] == matrix[1][1] == matrix[2][2] or matrix[0][2] == matrix[1][1] == matrix[2][0]:
-        if matrix[0][0] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-    '''
+    matrix_zones = [matrix[0],                                  # first raw
+                    matrix[1],                                  # second raw
+                    matrix[2],                                  # third raw
+                    [i[0] for i in matrix],                     # first column
+                    [i[1] for i in matrix],                     # second column
+                    [i[2] for i in matrix],                     # third column
+                    [matrix[i][i] for i in range(3)],           # left-to-right diagonal
+                    [matrix[0][2], matrix[1][1], matrix[2][0]]] # right-to-left diagonal
 
+    print(matrix_zones)
+
+    try:
+        winner = list(filter(lambda *args: args[0] == args[1] == args[2], matrix_zones))
+        print(winner)
+
+        if winner:
+            if winner == player_char:
+                print("You won!")
+            else:
+                print("You lost :(")
+
+            # gameOver = True
+    except IndexError:
+        print("IndexError")
+    '''
+    
     if matrix[0][0] == matrix[0][1] == matrix[0][2]:
-        if matrix[0][0] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-
-        gameOver = True
+        raise gameOver(matrix[0][0])
     elif matrix[1][0] == matrix[1][1] == matrix[1][2]:
-        if matrix[1][0] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-
-        gameOver = True
+        raise gameOver(matrix[1][0])
     elif matrix[2][0] == matrix[2][1] == matrix[2][2]:
-        if matrix[2][0] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-
-        gameOver = True
+        raise gameOver(matrix[2][0])
     elif matrix[0][0] == matrix[1][0] == matrix[2][0]:
-        if matrix[0][0] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-
-        gameOver = True
+        raise gameOver(matrix[0][0])
     elif matrix[0][1] == matrix[1][1] == matrix[2][1]:
-        if matrix[0][1] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-
-        gameOver = True
+        raise gameOver(matrix[0][1])
     elif matrix[0][2] == matrix[1][2] == matrix[2][2]:
-        if matrix[0][2] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-
-        gameOver = True
+        raise gameOver(matrix[0][2])
     elif matrix[0][0] == matrix[1][1] == matrix[2][2]:
-        if matrix[0][0] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
-
-        gameOver = True
+        raise gameOver(matrix[0][0])
     elif matrix[0][2] == matrix[1][1] == matrix[2][0]:
-        if matrix[0][2] == player_char:
-            print("You won!")
-        else:
-            print("You lost :(")
+        raise gameOver(matrix[0][2])
 
-        gameOver = True
-
-Draw()
-
-while not gameOver:
-    Input()
-    Logic()
+try:
     Draw()
-    Win()
+
+    while True:
+        Input()
+        Draw()
+        Win()
+        Logic()
+        Draw()
+        Win()
+except gameOver as g:
+    print(g.message)
