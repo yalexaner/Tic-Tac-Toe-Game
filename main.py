@@ -23,37 +23,41 @@ class gameOver(Exception):
             self.message = "It's Draw"
 
 matrix = [[str(i + 1 + (j * 3)) for i in range(3)] for j in range(3)]
-# gameOver = False
 
 os.system("clear")
 
 print("Hello in Tic Tac Toe Game!")
-player_char = input("Enter your charachter you want (X/O): ")
+player_char = str(input("Enter character you want (X/O): "))
+
+while player_char != 'O' and player_char != 'X':
+    os.system("clear")
+
+    print("Wrong symbol! You can use only 'X' or 'O'")
+    player_char = str(input("Try again: "))
+
+os.system("clear")
+
 comp_char = list(filter(lambda char: char != player_char, ['X', 'O']))[0]
 
 def Draw():
-    os.system("clear")
-
     for raw in matrix:
         for num in raw:
             print(num, end=' ')
         print()
 
 def Input():
-    while True:
-        user_input = int(input("Enter the number of the field: "))
+	user_input = int(input("Enter the number of the field: "))
 
-        raw = (user_input - 1) // 3
-        col = (user_input - 1) % 3
+	if not 0 < user_input < 10:
+		raise IndexError
 
-        try:
-            if matrix[raw][col] == 'O' or matrix[raw][col] == 'X':
-                raise UsedFieldError
-        except UsedFieldError:
-            print("This field already used! Try another field")
-        else:
-            matrix[raw][col] = player_char
-            break
+	raw = (user_input - 1) // 3
+	col = (user_input - 1) % 3
+
+	if matrix[raw][col] == 'O' or matrix[raw][col] == 'X':
+		raise UsedFieldError
+
+	matrix[raw][col] = player_char
 
 def Logic():
     while True:
@@ -125,14 +129,32 @@ def Win():
     raise gameOver("draw")
 
 try:
-    Draw()
+	while True:
+		Draw()
+		try:
+			Input()
+		except UsedFieldError:
+			os.system("clear")
+			print("This field already used! Try another field", end='\n\n')
 
-    while True:
-        Input()
-        Draw()
-        Win()
-        Logic()
-        Draw()
-        Win()
+			continue
+		except (IndexError, ValueError):
+			os.system("clear")
+			print("Wrong symbol! Try again.", end='\n\n')
+
+			continue
+
+		os.system("clear")
+
+		Draw()
+		Win()
+		Logic()
+
+		os.system("clear")
+
+		Draw()
+		Win()
+
+		os.system("clear")
 except gameOver as g:
-    print(g.message)
+	print(g.message)
